@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: adventureworks
+      POSTGRES_USER: aw_user
+      POSTGRES_PASSWORD: aw_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init_adventureworks.sh:/docker-entrypoint-initdb.d/init.sh
+
+  mcp_server:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    ports:
+      - "8080:8080"
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    volumes:
+      - ./bronze/data:/app/bronze/data
+      - ./silver/data:/app/silver/data
+      - ./gold/data:/app/gold/data
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

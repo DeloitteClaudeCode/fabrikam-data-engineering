@@ -1,0 +1,9 @@
+anthropic>=0.40.0
+mcp>=1.0.0
+great-expectations>=0.18.0
+psycopg2-binary>=2.9.0
+pandas>=2.0.0
+pyarrow>=14.0.0
+delta-spark>=3.0.0
+pytest>=7.4.0
+pytest-asyncio>=0.21.0

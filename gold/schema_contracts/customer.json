@@ -1,0 +1,20 @@
+{
+  "table": "customer",
+  "zone": "gold",
+  "version": "1.0",
+  "description": "Golden customer record — one row per resolved customer identity",
+  "columns": {
+    "customer_id": {"type": "string", "nullable": false, "description": "Fabrikam golden customer UUID"},
+    "first_name": {"type": "string", "nullable": false},
+    "last_name": {"type": "string", "nullable": false},
+    "email_masked": {"type": "string", "nullable": true, "description": "Masked: first 2 chars + domain only"},
+    "loyalty_segment": {"type": "string", "nullable": true, "description": "Bronze/Silver/Gold/Platinum"},
+    "record_confidence": {"type": "float", "nullable": false, "description": "0.0-1.0 aggregate field confidence"},
+    "source_systems": {"type": "string", "nullable": false, "description": "Comma-separated source system names"},
+    "created_at_utc": {"type": "string", "nullable": false},
+    "updated_at_utc": {"type": "string", "nullable": false}
+  },
+  "pii_policy": "fully_masked",
+  "owner": "data_engineering",
+  "producer_contract": "silver/entity_resolution/survivorship.py"
+}

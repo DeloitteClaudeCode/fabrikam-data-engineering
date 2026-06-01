@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+.env.*
+*.jsonl
+!quality/scorecard/golden_pairs.py
+bronze/data/
+silver/data/
+gold/data/
+quality/audit_log.jsonl
+quality/swamp_health.json
+quality/scorecard/last_run.jsonl
+.venv/
+venv/
+node_modules/
+*.log

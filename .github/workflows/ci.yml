@@ -1,0 +1,62 @@
+name: Fabrikam Data Engineering CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  quality-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: pytest tests/ -v
+
+      - name: Generate test fixtures
+        run: python scripts/generate_test_data.py
+
+      - name: Run batch ingestion smoke test
+        run: python -c "
+from bronze.ingestion.batch_ingestion import ingest_batch_file, validate_pos_record
+result = ingest_batch_file('data/fixtures/pos.csv', 'pos', validate_pos_record, '/tmp/bronze')
+assert result['records_landed'] > 0, 'No records landed'
+print('Batch ingestion: OK')
+"
+
+      - name: Run entity matcher scorecard
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python -m quality.scorecard.eval_harness
+        # Exit 1 if false-confidence regression > 1pp vs baseline
+
+      - name: Test Gold hook blocks malformed write
+        run: python -c "
+import sys, json
+from quality.hook import check_gold_write
+# Deliberately malformed: PII in Gold
+records = [{'customer_id': 'uuid-001', 'email_masked': 'john.doe@example.com'}]  # raw email = PII
+import os; os.makedirs('gold/schema_contracts', exist_ok=True)
+# Write minimal contract
+with open('gold/schema_contracts/customer.json', 'w') as f:
+    json.dump({'table': 'customer', 'zone': 'gold', 'version': '1.0',
+               'columns': {'customer_id': {'nullable': False}, 'email_masked': {'nullable': True}}}, f)
+allowed, results = check_gold_write('customer', records)
+# PII check should block this
+pii_result = next((r for r in results if r.rule_id == 'pii_in_gold'), None)
+if pii_result and not pii_result.passed:
+    print('Gold hook correctly blocked PII write: OK')
+else:
+    print('Gold hook DID NOT block PII write: FAIL')
+    sys.exit(1)
+"
