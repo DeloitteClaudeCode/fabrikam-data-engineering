@@ -126,14 +126,15 @@ CRM_RECORDS = [
      "last_name": "Wilson",
      "phone": "512-555-0055", "address_line1": "8 Cedar Ave",
      "city": "Austin", "state": "TX", "postal_code": "78701",
-     "dob": "1965-11-03"},  # DOB differs from POS record — negative case
+     "dob": "1965-11-03", "notes": "DOB differs from POS record - negative case"},
 ]
 
 
 def write_crm_fixture():
     out = OUTPUT_DIR / "crm.csv"
+    fieldnames = list(dict.fromkeys(k for r in CRM_RECORDS for k in r.keys()))
     with out.open("w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=list(CRM_RECORDS[0].keys()))
+        writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore", restval="")
         writer.writeheader()
         writer.writerows(CRM_RECORDS)
     print(f"Written: {out} ({len(CRM_RECORDS)} rows)")

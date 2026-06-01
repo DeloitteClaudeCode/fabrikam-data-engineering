@@ -44,10 +44,10 @@ class EvalMetrics:
     def report(self) -> str:
         lines = [
             f"Entity Matcher Scorecard",
-            f"  Precision:            {self.precision:.3f}  (target ≥0.92)",
-            f"  Recall:               {self.recall:.3f}  (target ≥0.85)",
+            f"  Precision:            {self.precision:.3f}  (target >=0.92)",
+            f"  Recall:               {self.recall:.3f}  (target >=0.85)",
             f"  F1:                   {self.f1:.3f}",
-            f"  False-confidence rate:{self.false_confidence_rate:.3f}  (target ≤0.05)",
+            f"  False-confidence rate:{self.false_confidence_rate:.3f}  (target <=0.05)",
             f"  Total pairs:          {self.total_pairs}",
             "",
             "Stratum Breakdown:",

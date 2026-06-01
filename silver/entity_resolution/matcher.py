@@ -72,10 +72,7 @@ def match_records(
     if client is None:
         client = anthropic.Anthropic()
 
-    prompt = MATCHER_PROMPT.format(
-        record_a=json.dumps(record_a, ensure_ascii=False),
-        record_b=json.dumps(record_b, ensure_ascii=False),
-    )
+    prompt = MATCHER_PROMPT.replace("{record_a}", json.dumps(record_a, ensure_ascii=False)).replace("{record_b}", json.dumps(record_b, ensure_ascii=False))
 
     response = client.messages.create(
         model="claude-sonnet-4-6",
